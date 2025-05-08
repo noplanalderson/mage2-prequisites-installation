@@ -14,6 +14,11 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+# Magento DB Password (HARAP DIUBAH!)
+MAGEDB_NAME=magentodb
+MAGEDB_USER=magentouser
+MAGEDB_PASSWD=_Ch4n93M3e_!!!
+
 # Fungsi untuk mencetak pesan
 print_message() {
     echo -e "${GREEN}[INFO] $1${NC}"
@@ -55,9 +60,9 @@ EOF
 
 # Buat database dan pengguna untuk Magento
 print_message "Mengatur database Magento..."
-mysql -e "CREATE DATABASE magentodb;"
-mysql -e "CREATE USER 'magentouser'@'localhost' IDENTIFIED BY 'Str0n9p4sSw0rd!@#';"
-mysql -e "GRANT ALL ON magentodb.* TO 'magentouser'@'localhost';"
+mysql -e "CREATE DATABASE $MAGEDB_NAME;"
+mysql -e "CREATE USER '$MAGEDB_USER'@'localhost' IDENTIFIED BY '$MAGEDB_PASSWD';"
+mysql -e "GRANT ALL ON $MAGEDB_NAME.* TO '$MAGEDB_USER'@'localhost';"
 mysql -e "FLUSH PRIVILEGES;"
 
 # Instal PHP 8.3 dan ekstensi yang diperlukan
@@ -74,6 +79,7 @@ sed -i 's/memory_limit = 128M/memory_limit = 512M/' $PHP_INI
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 128M/' $PHP_INI
 sed -i 's/max_execution_time = 30/max_execution_time = 3600/' $PHP_INI
 
+print_message "Mengkonfigurasi PHP-FPM untuk Magento..."
 cat <<EOF > /etc/php/8.3/fpm/pool.d/magento.conf
 [magento]
 user = www-data
@@ -348,7 +354,7 @@ nginx -t && systemctl reload nginx || print_error "Konfigurasi Nginx gagal"
 # Cetak informasi akhir
 print_message "Instalasi software pendukung selesai!"
 echo "Detail database:"
-echo "  Database: magentodb"
-echo "  Pengguna: magentouser"
-echo "  Kata sandi: Cb78seaVcLBP72J2KkhvCTUajUaOoV!"
+echo "  Database: $MAGEDB_NAME"
+echo "  Pengguna: $MAGEDB_USER"
+echo "  Kata sandi: $MAGEDB_PASSWD"
 echo "Lanjutkan dengan menginstal Magento menggunakan Composer di /usr/share/nginx/html/magento2."
