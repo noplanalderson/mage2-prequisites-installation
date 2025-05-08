@@ -18,6 +18,8 @@ NC='\033[0m' # No Color
 MAGEDB_NAME=magentodb
 MAGEDB_USER=magentouser
 MAGEDB_PASSWD=_Ch4n93M3e_!!!
+
+# Magento Domain/URL (SESUAIKAN)
 MAGE_SERVER_NAME=www.your-commerce.com
 
 # Fungsi untuk mencetak pesan
