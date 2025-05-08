@@ -18,6 +18,7 @@ NC='\033[0m' # No Color
 MAGEDB_NAME=magentodb
 MAGEDB_USER=magentouser
 MAGEDB_PASSWD=_Ch4n93M3e_!!!
+MAGE_SERVER_NAME=www.your-commerce.com
 
 # Fungsi untuk mencetak pesan
 print_message() {
@@ -149,7 +150,7 @@ print_message "Mengkonfigurasi Nginx untuk Magento..."
 cat <<EOF > /etc/nginx/sites-available/magento2
 server {
     listen 80;
-    server_name k7commerce.my.id;
+    server_name $MAGE_SERVER_NAME;
     set \$MAGE_ROOT /usr/share/nginx/html/magento2;
     set \$MAGE_MODE production;
 
