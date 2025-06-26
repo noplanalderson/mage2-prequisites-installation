@@ -16,6 +16,15 @@
 # chmod +x mage-prequisites-install.sh
 ```
 
+- Disable SWAP Linux, untuk mencegah konsumsi SWAP ketika resource RAM penuh. Agar tidak membebani storage dan mencegah perlambatan performa server
+```bash
+$  sudo  nano /etc/fstab
+// Ubah baris:
+/swapfile swap swap  defaults 0 0
+// Menjadi
+#/swapfile swap swap  defaults 0 0
+```
+
 - Sebelum menjalankan proses instalasi software pendukung, sesuaikan hak akses database dan server name
 
 ```bash
@@ -63,6 +72,7 @@ Do you want to store credentials for repo.magento.com in /root/.config/composer/
 ```
 
 - Masukkan public key sebagai username dan private key sebagai password
+- Public Key dan Private Key bisa didapatkan pada [https://commercemarketplace.adobe.com/customer/account/](https://commercemarketplace.adobe.com/customer/accessKeys/) (Perlu Akun Adobe)
 - Tunggu hingga proses unduh selesai
 
 ```bash
@@ -130,10 +140,27 @@ $  sudo  nano  /etc/elasticsearch/jvm.options
 ```
 - Tambahkan kode berikut pada bagian paling bawah
 ```bash
--Xms2g
--Xmx2g
+-Xms512m
+-Xmx512m
 ```
 - Kemudian simpan dan keluar, serta restart service elasticsearch
 ```bash
 $  sudo  systemctl  restart  elasticsearch
+```
+- Tambahkan konfigurasi kustom untuk meningkatkan performa MySQL
+```bash
+$ sudo nano /etc/mysql/mysql.conf.d/my.cnf
+```
+- Konfigurasinya
+```
+[mysql]
+innodb_buffer_pool_size = 512M
+innodb_log_file_size = 128M
+max_connections = 50
+query_cache_size = 64M
+tmp_table_size = 64M
+max_allowed_packet = 256M
+slow_query_log = 1
+slow_query_log_file = /var/log/mysql/slow.log
+long_query_time = 2
 ```
