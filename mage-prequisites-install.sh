@@ -64,8 +64,8 @@ EOF
 # Buat database dan pengguna untuk Magento
 print_message "Mengatur database Magento..."
 mysql -e "CREATE DATABASE $MAGEDB_NAME;"
-mysql -e "CREATE USER '$MAGEDB_USER'@'localhost' IDENTIFIED BY '$MAGEDB_PASSWD';"
-mysql -e "GRANT ALL ON $MAGEDB_NAME.* TO '$MAGEDB_USER'@'localhost';"
+mysql -e "CREATE USER '$MAGEDB_USER'@'%' IDENTIFIED BY '$MAGEDB_PASSWD';"
+mysql -e "GRANT ALL ON $MAGEDB_NAME.* TO '$MAGEDB_USER'@'%';"
 mysql -e "FLUSH PRIVILEGES;"
 
 # Instal PHP 8.3 dan ekstensi yang diperlukan
@@ -79,7 +79,8 @@ print_message "Mengkonfigurasi PHP..."
 PHP_INI="/etc/php/8.3/fpm/php.ini"
 sed -i 's/short_open_tag = Off/short_open_tag = On/' $PHP_INI
 sed -i 's/memory_limit = 128M/memory_limit = 512M/' $PHP_INI
-sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 128M/' $PHP_INI
+sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 25M/' $PHP_INI
+sed -i 's/post_max_size = 8M/post_max_size = 30M/' $PHP_INI
 sed -i 's/max_execution_time = 30/max_execution_time = 3600/' $PHP_INI
 
 print_message "Mengkonfigurasi PHP-FPM untuk Magento..."
@@ -100,7 +101,6 @@ pm.max_spare_servers = 3
 php_flag[display_errors] = off
 php_admin_value[error_log] = /var/log/fpm-php-magento.log
 php_admin_value[memory_limit] = 512M
-
 EOF
 
 # Restart PHP-FPM
@@ -146,6 +146,14 @@ print_message "Mengatur direktori Magento..."
 mkdir -p /usr/share/nginx/html/magento2
 chown -R www-data:www-data /usr/share/nginx/html/magento2
 chmod -R 755 /usr/share/nginx/html/magento2
+
+print_message "Mengkonfigurasi Nginx client_max_body_size sebesar 30MB..."
+NGINX_CONF="/etc/nginx/nginx.conf"
+if ! grep -q "client_max_body_size" $NGINX_CONF; then
+    sed -i '/http {/a \    client_max_body_size 30M;' $NGINX_CONF
+else
+    sed -i 's/client_max_body_size.*/client_max_body_size 50M;/' $NGINX_CONF
+fi
 
 # Konfigurasi Nginx untuk Magento
 print_message "Mengkonfigurasi Nginx untuk Magento..."
